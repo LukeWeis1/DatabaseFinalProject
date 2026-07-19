@@ -10,3 +10,14 @@ CREATE TABLE StaffMember (
     CreatedBy INT,
     FOREIGN KEY (CreatedBy) REFERENCES StaffMember(EmployeeID)
 );
+
+CREATE TABLE Vehicle (
+	LicensePlate VARCHAR(20) PRIMARY KEY,
+	Make VARCHAR (50) NOT NULL,
+	Model VARCHAR (50) NOT NULL,
+	ModelYear INT NOT NULL,
+	TypeOfVehicle VARCHAR(50) NOT NULL,
+	IsAvailable BOOLEAN DEFAULT TRUE NOT NULL,
+	CreatedBy INT,
+    FOREIGN KEY (CreatedBy) REFERENCES StaffMember(EmployeeID)
+);
