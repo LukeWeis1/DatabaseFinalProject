@@ -45,3 +45,16 @@ CREATE TABLE CustomerPhoneNumbers (
     PRIMARY KEY (DriversLicenseNumber, PhoneNumber),
     FOREIGN KEY (DriversLicenseNumber) REFERENCES Customer(DriversLicenseNumber) ON DELETE CASCADE
 );
+
+CREATE TABLE Rents (
+    LicensePlate VARCHAR(20) NOT NULL,
+    DriversLicenseNumber VARCHAR(50) NOT NULL,
+    EmployeeID INT NOT NULL,
+    RentedDate DATE NOT NULL,
+    ExpectedReturnDate DATE NOT NULL,
+	ReturnDate DATE,
+    PRIMARY KEY (LicensePlate, RentedDate),
+    FOREIGN KEY (LicensePlate) REFERENCES Vehicle(LicensePlate),
+    FOREIGN KEY (DriversLicenseNumber) REFERENCES Customer(DriversLicenseNumber),
+    FOREIGN KEY (EmployeeID) REFERENCES StaffMember(EmployeeID)
+);
