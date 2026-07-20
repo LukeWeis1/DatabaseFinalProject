@@ -26,3 +26,8 @@ INSERT INTO Vehicle (LicensePlate, Make, Model, ModelYear, TypeOfVehicle, IsAvai
 VALUES 
 ('TEST-01', 'Tesla', 'Model 3', 2024, 'Sedan', TRUE, 1),
 ('TEST-02', 'Ford', 'Bronco', 2023, 'SUV', FALSE, 2);
+
+INSERT INTO Rents (LicensePlate, DriversLicenseNumber, EmployeeID, RentedDate, ExpectedReturnDate, ReturnDate)
+VALUES 
+('TEST-01', 'RICK-137-C137', 1, '2026-07-01', '2026-07-05', '2026-07-05'),
+('TEST-02', 'MORTY-99-S99', 2, '2026-07-15', '2026-07-25', NULL);
