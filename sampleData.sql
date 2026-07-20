@@ -21,3 +21,8 @@ VALUES
 ('RICK-137-C137', '555-4355'),
 ('MORTY-99-S99', '555-3451'), 
 ('MORTY-99-S99', '555-0567');
+
+INSERT INTO Vehicle (LicensePlate, Make, Model, ModelYear, TypeOfVehicle, IsAvailable, CreatedBy)
+VALUES 
+('TEST-01', 'Tesla', 'Model 3', 2024, 'Sedan', TRUE, 1),
+('TEST-02', 'Ford', 'Bronco', 2023, 'SUV', FALSE, 2);
