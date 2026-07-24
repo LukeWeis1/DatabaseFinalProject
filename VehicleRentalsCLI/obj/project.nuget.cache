@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "rB6orTLLGNs=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\lukew\\OneDrive\\Documents\\College\\3rd Year\\2nd Semester\\Database\\Final Project\\DatabaseFinalProject\\VehicleRentalsCLI\\VehicleRentalsCLI.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\lukew\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\10.0.0\\microsoft.extensions.dependencyinjection.abstractions.10.0.0.nupkg.sha512",
+    "C:\\Users\\lukew\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\10.0.0\\microsoft.extensions.logging.abstractions.10.0.0.nupkg.sha512",
+    "C:\\Users\\lukew\\.nuget\\packages\\npgsql\\10.0.3\\npgsql.10.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
