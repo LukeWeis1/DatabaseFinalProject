@@ -1,77 +1,52 @@
 ﻿using System;
-using Npgsql;
 
-class VehicleRentalsApplication
+namespace VehicleRentalsCLI
 {
-
-    //Database Connection String
-    private const string ConnectionString = "Host=localhost;Username=postgres;Password=luke;Database=VehicleRental";
-
-    static void Main()
+    class Program
     {
-
-        bool isLoggedIn = false;
-        while (!isLoggedIn)
+        static void Main()
         {
-            isLoggedIn = Login();
-            if (!isLoggedIn)
+            DatabaseContext dbContext = new DatabaseContext();
+            AuthService authService = new AuthService(dbContext);
+
+            StaffMember? currentUser = null;
+
+            while (currentUser == null)
             {
-                Console.WriteLine("Please try again.");
-            }
-        }
-    }
-
-    static bool Login()
-    {
-        Console.WriteLine("\n--- LOGIN ---");
-        Console.Write("Enter Employee ID: ");
-        string idInput = Console.ReadLine() ?? "";
-        if (!int.TryParse(idInput, out int employeeId))
-        {
-            Console.WriteLine("[!] Invalid ID format. Must be a number.");
-            return false;
-        }
-
-        Console.Write("Enter Password: ");
-        string password = Console.ReadLine() ?? "";
-
-        try
-        {
-            using (NpgsqlConnection conn = new NpgsqlConnection(ConnectionString))
-            {
-                conn.Open();
-
-                string sql = "SELECT FirstName, LastName FROM StaffMember WHERE EmployeeID = @id::integer AND Password = @password;";
-                using (NpgsqlCommand cmd = new NpgsqlCommand(sql, conn))
+                currentUser = HandleLoginScreen(authService);
+                if (currentUser == null)
                 {
-                    cmd.Parameters.AddWithValue("@id", employeeId);
-                    cmd.Parameters.AddWithValue("@password", password);
-
-                    using (NpgsqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            string firstName = (string)reader["FirstName"];
-                            string lastName = (string)reader["LastName"];
-
-                            Console.WriteLine($"\n Welcome, {firstName} {lastName}!");
-                            return true;
-                        }
-                        else
-                        {
-                            Console.WriteLine("\n Invalid Employee ID or Password.");
-                            return false;
-                        }
-                    }
+                    Console.WriteLine("Please try again.\n");
                 }
             }
+
+            Console.WriteLine($"\n==============================");
+            Console.WriteLine($" MAIN MENU (Logged in as: {currentUser.FirstName})");
+            Console.WriteLine($"==============================");
+
         }
-        catch (Exception ex)
+
+        static StaffMember? HandleLoginScreen(AuthService authService)
         {
-            Console.WriteLine($"\n Database connection failed:\n{ex.Message}");
-            return false;
+            Console.WriteLine("\n--- LOGIN ---");
+            Console.Write("Enter Employee ID: ");
+            string idInput = Console.ReadLine() ?? "";
+
+            Console.Write("Enter Password: ");
+            string password = Console.ReadLine() ?? "";
+
+            StaffMember? loggedInUser = authService.AttemptLogin(idInput, password);
+
+            if (loggedInUser != null)
+            {
+                Console.WriteLine($"\n Welcome, {loggedInUser.FirstName} {loggedInUser.LastName}!");
+                return loggedInUser;
+            }
+            else
+            {
+                Console.WriteLine("\n Invalid Employee ID or Password.");
+                return null;
+            }
         }
     }
 }
-
-
