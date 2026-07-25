@@ -48,5 +48,39 @@ namespace VehicleRentalsCLI
                 return null;
             }
         }
+
+        public bool AddCustomer(Customer newCustomer)
+        {
+            try
+            {
+                using (NpgsqlConnection conn = new NpgsqlConnection(ConnectionString))
+                {
+                    conn.Open();
+
+                    string sql = @"
+                        INSERT INTO Customer (DriversLicenseNumber, FirstName, LastName, DateOfBirth, CardNumber, CreatedBy)
+                        VALUES (@license, @firstName, @lastName, @dob, @cardNumber, @createdBy);";
+
+                    using (NpgsqlCommand cmd = new NpgsqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("license", newCustomer.DriversLicenseNumber);
+                        cmd.Parameters.AddWithValue("firstName", newCustomer.FirstName);
+                        cmd.Parameters.AddWithValue("lastName", newCustomer.LastName);
+                        cmd.Parameters.AddWithValue("dob", newCustomer.DateOfBirth);
+                        cmd.Parameters.AddWithValue("cardNumber", newCustomer.CardNumber);
+                        cmd.Parameters.AddWithValue("createdBy", newCustomer.CreatedBy);
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+
+                        return rowsAffected > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"\n Could not add customer: {ex.Message}");
+                return false;
+            }
+        }
     }
 }
