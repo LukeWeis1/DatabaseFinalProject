@@ -7,7 +7,7 @@ namespace VehicleRentalsCLI
     {
         private const string ConnectionString = "Host=localhost;Username=postgres;Password=luke;Database=VehicleRental";
 
-        public StaffMember? GetStaffMemberByCredentials(int employeeId, string password)
+        public User? GetStaffMemberByCredentials(int employeeId, string password)
         {
             try
             {
@@ -26,7 +26,7 @@ namespace VehicleRentalsCLI
                         {
                             if (reader.Read())
                             {
-                                return new StaffMember
+                                return new User
                                 {
                                     EmployeeId = (int)reader["EmployeeID"],
                                     FirstName = (string)reader["FirstName"],
@@ -79,6 +79,77 @@ namespace VehicleRentalsCLI
             catch (Exception ex)
             {
                 Console.WriteLine($"\n Could not add customer: {ex.Message}");
+                return false;
+            }
+        }
+
+        public bool AddVehicle(Vehicle newVehicle)
+        {
+            try
+            {
+                using (var conn = new NpgsqlConnection(ConnectionString))
+                {
+                    conn.Open();
+                    string sql = @"
+                        INSERT INTO Vehicle (LicensePlate, Make, Model, ModelYear, TypeOfVehicle, IsAvailable, CreatedBy)
+                        VALUES (@plate, @make, @model, @year, @type, @isAvailable, @createdBy);";
+
+                    using (var cmd = new NpgsqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("plate", newVehicle.LicensePlate);
+                        cmd.Parameters.AddWithValue("make", newVehicle.Make);
+                        cmd.Parameters.AddWithValue("model", newVehicle.Model);
+                        cmd.Parameters.AddWithValue("year", newVehicle.ModelYear);
+                        cmd.Parameters.AddWithValue("type", newVehicle.TypeOfVehicle);
+                        cmd.Parameters.AddWithValue("isAvailable", newVehicle.IsAvailable);
+                        cmd.Parameters.AddWithValue("createdBy", newVehicle.CreatedBy);
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        return rowsAffected > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"\n Could not add vehicle: {ex.Message}");
+                return false;
+            }
+        }
+
+        public bool AddStaffMember(StaffMember newStaff)
+        {
+            try
+            {
+                using (var conn = new NpgsqlConnection(ConnectionString))
+                {
+                    conn.Open();
+                    string sql = @"
+                        INSERT INTO StaffMember (FirstName, LastName, DateOfBirth, IsManager, Password, CompanyPhoneNumber, CompanyEmailAddress, CreatedBy)
+                        VALUES (@first, @last, @dob, @isManager, @password, @phone, @email, @createdBy);";
+
+                    using (var cmd = new NpgsqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("first", newStaff.FirstName);
+                        cmd.Parameters.AddWithValue("last", newStaff.LastName);
+                        cmd.Parameters.AddWithValue("dob", newStaff.DateOfBirth);
+                        cmd.Parameters.AddWithValue("isManager", newStaff.IsManager);
+                        cmd.Parameters.AddWithValue("password", newStaff.Password);
+                        cmd.Parameters.AddWithValue("phone", newStaff.CompanyPhoneNumber);
+                        cmd.Parameters.AddWithValue("email", newStaff.CompanyEmailAddress);
+
+                        if (newStaff.CreatedBy.HasValue)
+                            cmd.Parameters.AddWithValue("createdBy", newStaff.CreatedBy.Value);
+                        else
+                            cmd.Parameters.AddWithValue("createdBy", DBNull.Value);
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        return rowsAffected > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"\n Could not add staff member: {ex.Message}");
                 return false;
             }
         }

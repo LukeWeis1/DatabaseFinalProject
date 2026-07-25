@@ -1,44 +1,33 @@
+using System;
+
 namespace VehicleRentalsCLI
 {
-    public class AuthService
+    public class BusinessLogic
     {
         private readonly DatabaseContext _dbContext;
 
-        public AuthService(DatabaseContext dbContext)
+        public BusinessLogic(DatabaseContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public StaffMember? AttemptLogin(string idInput, string password)
+        //Authentication Logic
+        public User? AttemptLogin(string idInput, string password)
         {
-            //EmployeeID must be an integer
             if (!int.TryParse(idInput, out int employeeId))
             {
-                return null;
+                return null; 
             }
 
-            //Password cannot be empty
             if (string.IsNullOrWhiteSpace(password))
             {
                 return null;
             }
 
-            StaffMember? loggedInUser = _dbContext.GetStaffMemberByCredentials(employeeId, password);
-
-            return loggedInUser;
-        }
-    }
-
-
-    public class CustomerService
-    {
-        private readonly DatabaseContext _dbContext;
-
-        public CustomerService(DatabaseContext dbContext)
-        {
-            _dbContext = dbContext;
+            return _dbContext.GetStaffMemberByCredentials(employeeId, password);
         }
 
+        //Customer Logic
         public bool RegisterNewCustomer(string license, string firstName, string lastName, string dobInput, string card, int staffId)
         {
             if (string.IsNullOrWhiteSpace(license) || string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
@@ -64,6 +53,77 @@ namespace VehicleRentalsCLI
             };
 
             return _dbContext.AddCustomer(newCustomer);
+        }
+
+        //Vehicle Logic
+        public bool RegisterNewVehicle(string licensePlate, string make, string model, string yearInput, string type, int creatorId, bool isManager)
+        {
+            if (!isManager)
+            {
+                Console.WriteLine("\n ACCESS DENIED: Only managers are authorized to add new vehicles to the fleet.");
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(licensePlate) || string.IsNullOrWhiteSpace(make) || string.IsNullOrWhiteSpace(model))
+            {
+                Console.WriteLine("\n License Plate, Make, and Model cannot be empty.");
+                return false;
+            }
+
+            if (!int.TryParse(yearInput, out int year) || year < 1900 || year > DateTime.Now.Year + 1)
+            {
+                Console.WriteLine("\n Invalid Model Year.");
+                return false;
+            }
+
+            Vehicle newVehicle = new Vehicle
+            {
+                LicensePlate = licensePlate,
+                Make = make,
+                Model = model,
+                ModelYear = year,
+                TypeOfVehicle = type,
+                IsAvailable = true,
+                CreatedBy = creatorId
+            };
+
+            return _dbContext.AddVehicle(newVehicle);
+        }
+
+        //Staff logic
+        public bool RegisterNewStaff(string firstName, string lastName, string dobInput, bool makeManager, string password, string phone, string email, int creatorId, bool isManager)
+        {
+            if (!isManager)
+            {
+                Console.WriteLine("\n ACCESS DENIED: Only managers can add new staff.");
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName) || string.IsNullOrWhiteSpace(password))
+            {
+                Console.WriteLine("\n First Name, Last Name, and Password are required.");
+                return false;
+            }
+
+            if (!DateTime.TryParse(dobInput, out DateTime dateOfBirth))
+            {
+                Console.WriteLine("\n Invalid Date of Birth. Please use format YYYY-MM-DD.");
+                return false;
+            }
+
+            StaffMember newStaff = new StaffMember
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                IsManager = makeManager,
+                Password = password,
+                CompanyPhoneNumber = phone,
+                CompanyEmailAddress = email,
+                CreatedBy = creatorId
+            };
+
+            return _dbContext.AddStaffMember(newStaff);
         }
     }
 }
