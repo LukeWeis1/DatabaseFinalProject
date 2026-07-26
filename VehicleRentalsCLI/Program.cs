@@ -138,7 +138,26 @@ namespace VehicleRentalsCLI
             Console.Write("Credit Card Number: ");
             string card = Console.ReadLine() ?? "";
 
-            bool success = businessLogic.RegisterNewCustomer(license, firstName, lastName, dob, card, currentStaffId);
+            System.Collections.Generic.List<string> emails = new System.Collections.Generic.List<string>();
+            while (true)
+            {
+                Console.Write("Enter Email Address (or press Enter to finish): ");
+                string email = Console.ReadLine()?.Trim() ?? "";
+                if (string.IsNullOrEmpty(email)) break;
+                emails.Add(email);
+            }
+
+            System.Collections.Generic.List<string> phones = new System.Collections.Generic.List<string>();
+            while (true)
+            {
+                Console.Write("Enter Phone Number (or press Enter to finish): ");
+                string phone = Console.ReadLine()?.Trim() ?? "";
+                if (string.IsNullOrEmpty(phone)) break;
+                phones.Add(phone);
+            }
+
+
+            bool success = businessLogic.RegisterNewCustomer(license, firstName, lastName, dob, card, emails, phones, currentStaffId);
             if (success)
             {
                 Console.WriteLine($"\n Customer {firstName} {lastName} was successfully added to the system!");

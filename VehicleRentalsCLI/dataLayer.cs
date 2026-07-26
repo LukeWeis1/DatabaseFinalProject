@@ -53,32 +53,66 @@ namespace VehicleRentalsCLI
         {
             try
             {
-                using (NpgsqlConnection conn = new NpgsqlConnection(ConnectionString))
+                using (var conn = new NpgsqlConnection(ConnectionString))
                 {
                     conn.Open();
 
-                    string sql = @"
-                        INSERT INTO Customer (DriversLicenseNumber, FirstName, LastName, DateOfBirth, CardNumber, CreatedBy)
-                        VALUES (@license, @firstName, @lastName, @dob, @cardNumber, @createdBy);";
-
-                    using (NpgsqlCommand cmd = new NpgsqlCommand(sql, conn))
+                    using (var transaction = conn.BeginTransaction())
                     {
-                        cmd.Parameters.AddWithValue("license", newCustomer.DriversLicenseNumber);
-                        cmd.Parameters.AddWithValue("firstName", newCustomer.FirstName);
-                        cmd.Parameters.AddWithValue("lastName", newCustomer.LastName);
-                        cmd.Parameters.AddWithValue("dob", newCustomer.DateOfBirth);
-                        cmd.Parameters.AddWithValue("cardNumber", newCustomer.CardNumber);
-                        cmd.Parameters.AddWithValue("createdBy", newCustomer.CreatedBy);
+                        try
+                        {
+                            string sqlCust = @"
+                                INSERT INTO Customer (DriversLicenseNumber, FirstName, LastName, DateOfBirth, CardNumber, CreatedBy)
+                                VALUES (@license, @firstName, @lastName, @dob, @cardNumber, @createdBy);";
 
-                        int rowsAffected = cmd.ExecuteNonQuery();
+                            using (var cmd = new NpgsqlCommand(sqlCust, conn, transaction))
+                            {
+                                cmd.Parameters.AddWithValue("license", newCustomer.DriversLicenseNumber);
+                                cmd.Parameters.AddWithValue("firstName", newCustomer.FirstName);
+                                cmd.Parameters.AddWithValue("lastName", newCustomer.LastName);
+                                cmd.Parameters.AddWithValue("dob", newCustomer.DateOfBirth);
+                                cmd.Parameters.AddWithValue("cardNumber", newCustomer.CardNumber);
+                                cmd.Parameters.AddWithValue("createdBy", newCustomer.CreatedBy);
+                                cmd.ExecuteNonQuery();
+                            }
 
-                        return rowsAffected > 0;
+                            foreach (string email in newCustomer.Emails)
+                            {
+                                string sqlEmail = "INSERT INTO CustomerEmails (DriversLicenseNumber, EmailAddress) VALUES (@license, @email);";
+                                using (var cmd = new NpgsqlCommand(sqlEmail, conn, transaction))
+                                {
+                                    cmd.Parameters.AddWithValue("license", newCustomer.DriversLicenseNumber);
+                                    cmd.Parameters.AddWithValue("email", email);
+                                    cmd.ExecuteNonQuery();
+                                }
+                            }
+
+                            foreach (string phone in newCustomer.PhoneNumbers)
+                            {
+                                string sqlPhone = "INSERT INTO CustomerPhoneNumbers (DriversLicenseNumber, PhoneNumber) VALUES (@license, @phone);";
+                                using (var cmd = new NpgsqlCommand(sqlPhone, conn, transaction))
+                                {
+                                    cmd.Parameters.AddWithValue("license", newCustomer.DriversLicenseNumber);
+                                    cmd.Parameters.AddWithValue("phone", phone);
+                                    cmd.ExecuteNonQuery();
+                                }
+                            }
+
+                            transaction.Commit();
+                            return true;
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            Console.WriteLine($"\n Could not add customer. Changes rolled back: {ex.Message}");
+                            return false;
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"\n Could not add customer: {ex.Message}");
+                Console.WriteLine($"\n Could not connect to database: {ex.Message}");
                 return false;
             }
         }

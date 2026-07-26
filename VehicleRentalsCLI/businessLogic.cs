@@ -28,7 +28,7 @@ namespace VehicleRentalsCLI
         }
 
         //Customer Logic
-        public bool RegisterNewCustomer(string license, string firstName, string lastName, string dobInput, string card, int staffId)
+        public bool RegisterNewCustomer(string license, string firstName, string lastName, string dobInput, string card, System.Collections.Generic.List<string> emails, System.Collections.Generic.List<string> phoneNumbers, int staffId)
         {
             if (string.IsNullOrWhiteSpace(license) || string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
             {
@@ -49,7 +49,9 @@ namespace VehicleRentalsCLI
                 LastName = lastName,
                 DateOfBirth = dateOfBirth,
                 CardNumber = card,
-                CreatedBy = staffId
+                CreatedBy = staffId,
+                Emails = emails,
+                PhoneNumbers = phoneNumbers
             };
 
             return _dbContext.AddCustomer(newCustomer);

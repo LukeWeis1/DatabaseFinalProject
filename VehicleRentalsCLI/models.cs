@@ -1,3 +1,4 @@
+using System;
 
 namespace VehicleRentalsCLI
 {
@@ -17,6 +18,8 @@ namespace VehicleRentalsCLI
         public DateTime DateOfBirth { get; set; }
         public string CardNumber { get; set; } = "";
         public int CreatedBy { get; set; } //EmployeeID of the staff member who created them
+        public System.Collections.Generic.List<string> Emails { get; set; } = new System.Collections.Generic.List<string>();
+        public System.Collections.Generic.List<string> PhoneNumbers { get; set; } = new System.Collections.Generic.List<string>();
     }
 
     public class Vehicle
