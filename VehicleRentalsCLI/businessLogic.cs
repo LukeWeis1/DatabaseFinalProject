@@ -16,7 +16,7 @@ namespace VehicleRentalsCLI
         {
             if (!int.TryParse(idInput, out int employeeId))
             {
-                return null; 
+                return null;
             }
 
             if (string.IsNullOrWhiteSpace(password))
@@ -97,6 +97,11 @@ namespace VehicleRentalsCLI
             return _dbContext.AddVehicle(newVehicle);
         }
 
+        public System.Collections.Generic.List<Vehicle> GetAllVehicles()
+        {
+            return _dbContext.GetAllVehicles();
+        }
+
         //Staff logic
         public bool RegisterNewStaff(string firstName, string lastName, string dobInput, bool makeManager, string password, string phone, string email, int creatorId, bool isManager)
         {
@@ -131,6 +136,11 @@ namespace VehicleRentalsCLI
             };
 
             return _dbContext.AddStaffMember(newStaff);
+        }
+
+        public System.Collections.Generic.List<StaffMember> GetAllStaffMembers()
+        {
+            return _dbContext.GetAllStaffMembers();
         }
     }
 }

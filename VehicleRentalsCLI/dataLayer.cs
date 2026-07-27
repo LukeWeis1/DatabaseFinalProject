@@ -188,7 +188,7 @@ namespace VehicleRentalsCLI
             }
         }
 
-         public System.Collections.Generic.List<Customer> GetAllCustomers()
+        public System.Collections.Generic.List<Customer> GetAllCustomers()
         {
             var customers = new System.Collections.Generic.List<Customer>();
             try
@@ -196,7 +196,7 @@ namespace VehicleRentalsCLI
                 using (var conn = new NpgsqlConnection(ConnectionString))
                 {
                     conn.Open();
-                    
+
                     string sql = @"
                         SELECT
                             c.DriversLicenseNumber,
@@ -247,6 +247,76 @@ namespace VehicleRentalsCLI
                 Console.WriteLine($"\n Could not retrieve customers: {ex.Message}");
             }
             return customers;
+        }
+        public System.Collections.Generic.List<Vehicle> GetAllVehicles()
+        {
+            var vehicles = new System.Collections.Generic.List<Vehicle>();
+            try
+            {
+                using (var conn = new NpgsqlConnection(ConnectionString))
+                {
+                    conn.Open();
+                    string sql = "SELECT LicensePlate, Make, Model, ModelYear, TypeOfVehicle, IsAvailable FROM Vehicle ORDER BY Make, Model;";
+
+                    using (var cmd = new NpgsqlCommand(sql, conn))
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            vehicles.Add(new Vehicle
+                            {
+                                LicensePlate = (string)reader["LicensePlate"],
+                                Make = (string)reader["Make"],
+                                Model = (string)reader["Model"],
+                                ModelYear = (int)reader["ModelYear"],
+                                TypeOfVehicle = (string)reader["TypeOfVehicle"],
+                                IsAvailable = (bool)reader["IsAvailable"]
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"\n Could not retrieve vehicles: {ex.Message}");
+            }
+            return vehicles;
+        }
+
+        public System.Collections.Generic.List<StaffMember> GetAllStaffMembers()
+        {
+            var staffList = new System.Collections.Generic.List<StaffMember>();
+            try
+            {
+                using (var conn = new NpgsqlConnection(ConnectionString))
+                {
+                    conn.Open();
+                    string sql = "SELECT EmployeeID, FirstName, LastName, DateOfBirth, IsManager, CompanyPhoneNumber, CompanyEmailAddress FROM StaffMember ORDER BY EmployeeID;";
+
+                    using (var cmd = new NpgsqlCommand(sql, conn))
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            staffList.Add(new StaffMember
+                            {
+                                EmployeeId = (int)reader["EmployeeID"],
+                                FirstName = (string)reader["FirstName"],
+                                LastName = (string)reader["LastName"],
+                                DateOfBirth = reader.GetFieldValue<DateOnly>(reader.GetOrdinal("DateOfBirth")).ToDateTime(TimeOnly.MinValue),
+                                IsManager = (bool)reader["IsManager"],
+                                CompanyPhoneNumber = (string)reader["CompanyPhoneNumber"],
+                                CompanyEmailAddress = (string)reader["CompanyEmailAddress"]
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"\n Could not retrieve staff members: {ex.Message}");
+            }
+            return staffList;
         }
     }
 }

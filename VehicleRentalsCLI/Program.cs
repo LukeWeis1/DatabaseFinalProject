@@ -35,6 +35,8 @@ namespace VehicleRentalsCLI
                 }
 
                 Console.WriteLine("4. View All Customers");
+                Console.WriteLine("5. View All Vehicles");
+                Console.WriteLine("6. View Staff Directory");
                 Console.WriteLine("9. Exit");
                 Console.Write("\n Choose an option: ");
 
@@ -55,6 +57,14 @@ namespace VehicleRentalsCLI
                 else if (choice == "4")
                 {
                     HandleViewCustomersScreen(businessLogic);
+                }
+                else if (choice == "5")
+                {
+                    HandleViewVehiclesScreen(businessLogic);
+                }
+                else if (choice == "6")
+                {
+                    HandleViewStaffScreen(businessLogic);
                 }
                 else if (choice == "9")
                 {
@@ -219,6 +229,45 @@ namespace VehicleRentalsCLI
                     Console.WriteLine("Phones: None");
             }
             Console.WriteLine("\n--------------------------");
+        }
+
+        static void HandleViewVehiclesScreen(BusinessLogic businessLogic)
+        {
+            Console.WriteLine("\n--- VEHICLE FLEET ---");
+            var vehicles = businessLogic.GetAllVehicles();
+
+            if (vehicles.Count == 0)
+            {
+                Console.WriteLine("No vehicles found in the database.");
+                return;
+            }
+
+            foreach (var v in vehicles)
+            {
+                string status = v.IsAvailable ? "Available" : "Rented Out";
+                Console.WriteLine($"[{v.LicensePlate}] {v.ModelYear} {v.Make} {v.Model} ({v.TypeOfVehicle}) - Status: {status}");
+            }
+            Console.WriteLine("---------------------");
+        }
+
+        static void HandleViewStaffScreen(BusinessLogic businessLogic)
+        {
+            Console.WriteLine("\n--- STAFF DIRECTORY ---");
+            var staff = businessLogic.GetAllStaffMembers();
+
+            if (staff.Count == 0)
+            {
+                Console.WriteLine("No staff found in the database.");
+                return;
+            }
+
+            foreach (var s in staff)
+            {
+                string role = s.IsManager ? "Manager" : "Staff";
+                Console.WriteLine($"[ID: {s.EmployeeId}] {s.FirstName} {s.LastName} ({role})");
+                Console.WriteLine($"    Email: {s.CompanyEmailAddress} | Phone: {s.CompanyPhoneNumber}");
+            }
+            Console.WriteLine("-----------------------");
         }
     }
 }
