@@ -187,5 +187,66 @@ namespace VehicleRentalsCLI
                 return false;
             }
         }
+
+         public System.Collections.Generic.List<Customer> GetAllCustomers()
+        {
+            var customers = new System.Collections.Generic.List<Customer>();
+            try
+            {
+                using (var conn = new NpgsqlConnection(ConnectionString))
+                {
+                    conn.Open();
+                    
+                    string sql = @"
+                        SELECT
+                            c.DriversLicenseNumber,
+                            c.FirstName,
+                            c.LastName,
+                            c.DateOfBirth,
+                            STRING_AGG(DISTINCT ce.EmailAddress, ',') AS Emails,
+                            STRING_AGG(DISTINCT cp.PhoneNumber, ',') AS PhoneNumbers
+                        FROM Customer c
+                        LEFT JOIN CustomerEmails ce ON c.DriversLicenseNumber = ce.DriversLicenseNumber
+                        LEFT JOIN CustomerPhoneNumbers cp ON c.DriversLicenseNumber = cp.DriversLicenseNumber
+                        GROUP BY c.DriversLicenseNumber, c.FirstName, c.LastName, c.DateOfBirth
+                        ORDER BY c.LastName, c.FirstName;";
+                    //Used left join so it would still show customers without emails and phone numbers
+
+                    using (var cmd = new NpgsqlCommand(sql, conn))
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var cust = new Customer
+                            {
+                                DriversLicenseNumber = (string)reader["DriversLicenseNumber"],
+                                FirstName = (string)reader["FirstName"],
+                                LastName = (string)reader["LastName"],
+                                DateOfBirth = reader.GetFieldValue<DateOnly>(reader.GetOrdinal("DateOfBirth")).ToDateTime(TimeOnly.MinValue)
+                            };
+
+                            string emailsAgg = reader["Emails"] as string ?? "";
+                            if (!string.IsNullOrEmpty(emailsAgg))
+                            {
+                                cust.Emails = new System.Collections.Generic.List<string>(emailsAgg.Split(','));
+                            }
+
+                            string phonesAgg = reader["PhoneNumbers"] as string ?? "";
+                            if (!string.IsNullOrEmpty(phonesAgg))
+                            {
+                                cust.PhoneNumbers = new System.Collections.Generic.List<string>(phonesAgg.Split(','));
+                            }
+
+                            customers.Add(cust);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"\n Could not retrieve customers: {ex.Message}");
+            }
+            return customers;
+        }
     }
 }

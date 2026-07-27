@@ -57,6 +57,11 @@ namespace VehicleRentalsCLI
             return _dbContext.AddCustomer(newCustomer);
         }
 
+        public System.Collections.Generic.List<Customer> GetAllCustomers()
+        {
+            return _dbContext.GetAllCustomers();
+        }
+
         //Vehicle Logic
         public bool RegisterNewVehicle(string licensePlate, string make, string model, string yearInput, string type, int creatorId, bool isManager)
         {

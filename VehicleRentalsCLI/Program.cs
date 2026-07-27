@@ -34,6 +34,7 @@ namespace VehicleRentalsCLI
                     Console.WriteLine("3. Add New Staff Member");
                 }
 
+                Console.WriteLine("4. View All Customers");
                 Console.WriteLine("9. Exit");
                 Console.Write("\n Choose an option: ");
 
@@ -50,6 +51,10 @@ namespace VehicleRentalsCLI
                 else if (choice == "3" && currentUser.IsManager)
                 {
                     HandleAddStaffScreen(businessLogic, currentUser.EmployeeId, currentUser.IsManager);
+                }
+                else if (choice == "4")
+                {
+                    HandleViewCustomersScreen(businessLogic);
                 }
                 else if (choice == "9")
                 {
@@ -185,6 +190,35 @@ namespace VehicleRentalsCLI
                 Console.WriteLine("\n Invalid Employee ID or Password.");
                 return null;
             }
+        }
+
+        static void HandleViewCustomersScreen(BusinessLogic businessLogic)
+        {
+            Console.WriteLine("\n--- CUSTOMER DIRECTORY ---");
+            var customers = businessLogic.GetAllCustomers();
+
+            if (customers.Count == 0)
+            {
+                Console.WriteLine("No customers found in the database.");
+                return;
+            }
+
+            foreach (var c in customers)
+            {
+                Console.WriteLine($"\nName: {c.FirstName} {c.LastName}");
+                Console.WriteLine($"DOB: {c.DateOfBirth.ToString("yyyy-MM-dd")} | License: {c.DriversLicenseNumber}");
+
+                if (c.Emails.Count > 0)
+                    Console.WriteLine($"Emails: {string.Join(", ", c.Emails)}");
+                else
+                    Console.WriteLine("Emails: None");
+
+                if (c.PhoneNumbers.Count > 0)
+                    Console.WriteLine($"Phones: {string.Join(", ", c.PhoneNumbers)}");
+                else
+                    Console.WriteLine("Phones: None");
+            }
+            Console.WriteLine("\n--------------------------");
         }
     }
 }
