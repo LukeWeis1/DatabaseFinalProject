@@ -318,5 +318,64 @@ namespace VehicleRentalsCLI
             }
             return staffList;
         }
+
+        public bool RentVehicle(string licensePlate, string driversLicense, DateTime expectedReturnDate, int employeeId)
+        {
+            try
+            {
+                using (var conn = new NpgsqlConnection(ConnectionString))
+                {
+                    conn.Open();
+                    
+                    using (var transaction = conn.BeginTransaction())
+                    {
+                        try
+                        {
+                            string updateSql = "UPDATE Vehicle SET IsAvailable = FALSE WHERE LicensePlate = @plate AND IsAvailable = TRUE;";
+                            using (var cmd = new NpgsqlCommand(updateSql, conn, transaction))
+                            {
+                                cmd.Parameters.AddWithValue("plate", licensePlate);
+                                int rows = cmd.ExecuteNonQuery();
+                                
+                                if (rows == 0)
+                                {
+                                    Console.WriteLine("\nERROR: The vehicle is either already rented out or does not exist.");
+                                    transaction.Rollback();
+                                    return false;
+                                }
+                            }
+
+                            string insertSql = @"
+                                INSERT INTO Rents (LicensePlate, DriversLicenseNumber, EmployeeID, RentedDate, ExpectedReturnDate, ReturnDate) 
+                                VALUES (@plate, @dl, @empId, CURRENT_DATE, @expected, NULL);";
+                                
+                            using (var cmd = new NpgsqlCommand(insertSql, conn, transaction))
+                            {
+                                cmd.Parameters.AddWithValue("plate", licensePlate);
+                                cmd.Parameters.AddWithValue("dl", driversLicense);
+                                cmd.Parameters.AddWithValue("empId", employeeId);
+                                cmd.Parameters.AddWithValue("expected", expectedReturnDate);
+                                cmd.ExecuteNonQuery();
+                            }
+
+                            transaction.Commit();
+                            return true;
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            
+                            Console.WriteLine($"\nERROR: Could not process rental: {ex.Message}");
+                            return false;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"\nCould not connect to database: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

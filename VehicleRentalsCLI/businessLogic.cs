@@ -102,6 +102,30 @@ namespace VehicleRentalsCLI
             return _dbContext.GetAllVehicles();
         }
 
+        public bool RentVehicle(string licensePlate, string driversLicense, string expectedReturnDateInput, int employeeId)
+        {
+            if (string.IsNullOrWhiteSpace(licensePlate) || string.IsNullOrWhiteSpace(driversLicense))
+            {
+                Console.WriteLine("\nLicense Plate and Drivers License Number cannot be empty.");
+                return false;
+            }
+
+            if (!DateTime.TryParse(expectedReturnDateInput, out DateTime expectedReturnDate))
+            {
+                Console.WriteLine("\nInvalid Expected Return Date. Please use format YYYY-MM-DD.");
+                return false;
+            }
+            
+            //Can't have a return date in the past
+            if (expectedReturnDate.Date < DateTime.Now.Date)
+            {
+                Console.WriteLine("\nExpected Return Date cannot be in the past.");
+                return false;
+            }
+
+            return _dbContext.RentVehicle(licensePlate, driversLicense, expectedReturnDate, employeeId);
+        }
+
         //Staff logic
         public bool RegisterNewStaff(string firstName, string lastName, string dobInput, bool makeManager, string password, string phone, string email, int creatorId, bool isManager)
         {

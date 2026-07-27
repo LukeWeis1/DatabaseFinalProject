@@ -37,6 +37,7 @@ namespace VehicleRentalsCLI
                 Console.WriteLine("4. View All Customers");
                 Console.WriteLine("5. View All Vehicles");
                 Console.WriteLine("6. View Staff Directory");
+                Console.WriteLine("7. Rent a Vehicle");
                 Console.WriteLine("9. Exit");
                 Console.Write("\n Choose an option: ");
 
@@ -65,6 +66,10 @@ namespace VehicleRentalsCLI
                 else if (choice == "6")
                 {
                     HandleViewStaffScreen(businessLogic);
+                }
+                else if (choice == "7")
+                {
+                    HandleRentVehicleScreen(businessLogic, currentUser.EmployeeId);
                 }
                 else if (choice == "9")
                 {
@@ -268,6 +273,26 @@ namespace VehicleRentalsCLI
                 Console.WriteLine($"    Email: {s.CompanyEmailAddress} | Phone: {s.CompanyPhoneNumber}");
             }
             Console.WriteLine("-----------------------");
+        }
+
+        static void HandleRentVehicleScreen(BusinessLogic businessLogic, int currentStaffId)
+        {
+            Console.WriteLine("\n--- RENT A VEHICLE ---");
+            Console.Write("Enter Vehicle License Plate: ");
+            string plate = Console.ReadLine() ?? "";
+
+            Console.Write("Enter Customer Drivers License Number: ");
+            string dl = Console.ReadLine() ?? "";
+
+            Console.Write("Enter Expected Return Date (YYYY-MM-DD): ");
+            string expectedDate = Console.ReadLine() ?? "";
+
+            bool success = businessLogic.RentVehicle(plate, dl, expectedDate, currentStaffId);
+            if (success)
+            {
+                Console.WriteLine($"\nVehicle {plate} has been successfully rented to customer {dl}!");
+                Console.WriteLine($"          Expected Return: {expectedDate}");
+            }
         }
     }
 }
