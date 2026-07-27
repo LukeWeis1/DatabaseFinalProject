@@ -38,6 +38,7 @@ namespace VehicleRentalsCLI
                 Console.WriteLine("5. View All Vehicles");
                 Console.WriteLine("6. View Staff Directory");
                 Console.WriteLine("7. Rent a Vehicle");
+                Console.WriteLine("8. Return a Vehicle");
                 Console.WriteLine("9. Exit");
                 Console.Write("\n Choose an option: ");
 
@@ -70,6 +71,10 @@ namespace VehicleRentalsCLI
                 else if (choice == "7")
                 {
                     HandleRentVehicleScreen(businessLogic, currentUser.EmployeeId);
+                }
+                else if (choice == "8")
+                {
+                    HandleReturnVehicleScreen(businessLogic);
                 }
                 else if (choice == "9")
                 {
@@ -292,6 +297,19 @@ namespace VehicleRentalsCLI
             {
                 Console.WriteLine($"\nVehicle {plate} has been successfully rented to customer {dl}!");
                 Console.WriteLine($"          Expected Return: {expectedDate}");
+            }
+        }
+
+        static void HandleReturnVehicleScreen(BusinessLogic businessLogic)
+        {
+            Console.WriteLine("\n--- RETURN A VEHICLE ---");
+            Console.Write("Enter Vehicle License Plate: ");
+            string plate = Console.ReadLine() ?? "";
+
+            bool success = businessLogic.ReturnVehicle(plate);
+            if (success)
+            {
+                Console.WriteLine($"\nVehicle {plate} has been successfully returned and is now available!");
             }
         }
     }

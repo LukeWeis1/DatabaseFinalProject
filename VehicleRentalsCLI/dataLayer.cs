@@ -326,7 +326,7 @@ namespace VehicleRentalsCLI
                 using (var conn = new NpgsqlConnection(ConnectionString))
                 {
                     conn.Open();
-                    
+
                     using (var transaction = conn.BeginTransaction())
                     {
                         try
@@ -336,7 +336,7 @@ namespace VehicleRentalsCLI
                             {
                                 cmd.Parameters.AddWithValue("plate", licensePlate);
                                 int rows = cmd.ExecuteNonQuery();
-                                
+
                                 if (rows == 0)
                                 {
                                     Console.WriteLine("\nERROR: The vehicle is either already rented out or does not exist.");
@@ -348,7 +348,7 @@ namespace VehicleRentalsCLI
                             string insertSql = @"
                                 INSERT INTO Rents (LicensePlate, DriversLicenseNumber, EmployeeID, RentedDate, ExpectedReturnDate, ReturnDate) 
                                 VALUES (@plate, @dl, @empId, CURRENT_DATE, @expected, NULL);";
-                                
+
                             using (var cmd = new NpgsqlCommand(insertSql, conn, transaction))
                             {
                                 cmd.Parameters.AddWithValue("plate", licensePlate);
@@ -364,8 +364,60 @@ namespace VehicleRentalsCLI
                         catch (Exception ex)
                         {
                             transaction.Rollback();
-                            
+
                             Console.WriteLine($"\nERROR: Could not process rental: {ex.Message}");
+                            return false;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"\nCould not connect to database: {ex.Message}");
+                return false;
+            }
+        }
+
+        public bool ReturnVehicle(string licensePlate)
+        {
+            try
+            {
+                using (var conn = new NpgsqlConnection(ConnectionString))
+                {
+                    conn.Open();
+
+                    using (var transaction = conn.BeginTransaction())
+                    {
+                        try
+                        {
+                            string updateRentsSql = "UPDATE Rents SET ReturnDate = CURRENT_DATE WHERE LicensePlate = @plate AND ReturnDate IS NULL;";
+                            using (var cmd = new NpgsqlCommand(updateRentsSql, conn, transaction))
+                            {
+                                cmd.Parameters.AddWithValue("plate", licensePlate);
+                                int rows = cmd.ExecuteNonQuery();
+
+                                if (rows == 0)
+                                {
+                                    Console.WriteLine("\nERROR: No active rental found for this vehicle (it might already be returned or doesn't exist).");
+                                    transaction.Rollback();
+                                    return false;
+                                }
+                            }
+
+                            string updateVehicleSql = "UPDATE Vehicle SET IsAvailable = TRUE WHERE LicensePlate = @plate;";
+                            using (var cmd = new NpgsqlCommand(updateVehicleSql, conn, transaction))
+                            {
+                                cmd.Parameters.AddWithValue("plate", licensePlate);
+                                cmd.ExecuteNonQuery();
+                            }
+
+                            transaction.Commit();
+                            return true;
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            Console.WriteLine($"\nERROR: Could not process return: {ex.Message}");
                             return false;
                         }
                     }

@@ -115,7 +115,7 @@ namespace VehicleRentalsCLI
                 Console.WriteLine("\nInvalid Expected Return Date. Please use format YYYY-MM-DD.");
                 return false;
             }
-            
+
             //Can't have a return date in the past
             if (expectedReturnDate.Date < DateTime.Now.Date)
             {
@@ -124,6 +124,17 @@ namespace VehicleRentalsCLI
             }
 
             return _dbContext.RentVehicle(licensePlate, driversLicense, expectedReturnDate, employeeId);
+        }
+
+        public bool ReturnVehicle(string licensePlate)
+        {
+            if (string.IsNullOrWhiteSpace(licensePlate))
+            {
+                Console.WriteLine("\nLicense Plate cannot be empty.");
+                return false;
+            }
+
+            return _dbContext.ReturnVehicle(licensePlate);
         }
 
         //Staff logic
