@@ -97,9 +97,9 @@ namespace VehicleRentalsCLI
             return _dbContext.AddVehicle(newVehicle);
         }
 
-        public System.Collections.Generic.List<Vehicle> GetAllVehicles()
+        public System.Collections.Generic.List<Vehicle> GetAllVehicles(bool? isAvailable = null)
         {
-            return _dbContext.GetAllVehicles();
+            return _dbContext.GetAllVehicles(isAvailable);
         }
 
         public bool RentVehicle(string licensePlate, string driversLicense, string expectedReturnDateInput, int employeeId)

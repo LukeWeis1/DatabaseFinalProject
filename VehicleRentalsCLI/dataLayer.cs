@@ -248,7 +248,7 @@ namespace VehicleRentalsCLI
             }
             return customers;
         }
-        public System.Collections.Generic.List<Vehicle> GetAllVehicles()
+        public System.Collections.Generic.List<Vehicle> GetAllVehicles(bool? isAvailable = null)
         {
             var vehicles = new System.Collections.Generic.List<Vehicle>();
             try
@@ -256,22 +256,37 @@ namespace VehicleRentalsCLI
                 using (var conn = new NpgsqlConnection(ConnectionString))
                 {
                     conn.Open();
-                    string sql = "SELECT LicensePlate, Make, Model, ModelYear, TypeOfVehicle, IsAvailable FROM Vehicle ORDER BY Make, Model;";
+
+                    string sql = "SELECT LicensePlate, Make, Model, ModelYear, TypeOfVehicle, IsAvailable FROM Vehicle";
+
+                    if (isAvailable.HasValue)
+                    {
+                        sql += " WHERE IsAvailable = @isAvailable";
+                    }
+
+                    sql += " ORDER BY Make, Model;";
 
                     using (var cmd = new NpgsqlCommand(sql, conn))
-                    using (var reader = cmd.ExecuteReader())
                     {
-                        while (reader.Read())
+                        if (isAvailable.HasValue)
                         {
-                            vehicles.Add(new Vehicle
+                            cmd.Parameters.AddWithValue("isAvailable", isAvailable.Value);
+                        }
+
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
                             {
-                                LicensePlate = (string)reader["LicensePlate"],
-                                Make = (string)reader["Make"],
-                                Model = (string)reader["Model"],
-                                ModelYear = (int)reader["ModelYear"],
-                                TypeOfVehicle = (string)reader["TypeOfVehicle"],
-                                IsAvailable = (bool)reader["IsAvailable"]
-                            });
+                                vehicles.Add(new Vehicle
+                                {
+                                    LicensePlate = (string)reader["LicensePlate"],
+                                    Make = (string)reader["Make"],
+                                    Model = (string)reader["Model"],
+                                    ModelYear = (int)reader["ModelYear"],
+                                    TypeOfVehicle = (string)reader["TypeOfVehicle"],
+                                    IsAvailable = (bool)reader["IsAvailable"]
+                                });
+                            }
                         }
                     }
                 }

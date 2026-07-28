@@ -244,11 +244,34 @@ namespace VehicleRentalsCLI
         static void HandleViewVehiclesScreen(BusinessLogic businessLogic)
         {
             Console.WriteLine("\n--- VEHICLE FLEET ---");
-            var vehicles = businessLogic.GetAllVehicles();
+            Console.WriteLine("1. Show Available Vehicles");
+            Console.WriteLine("2. Show Rented Out Vehicles");
+            Console.WriteLine("3. Show All Vehicles");
+            Console.Write("Filter choice (1-3): ");
+
+            string choice = Console.ReadLine() ?? "";
+            bool? isAvailable = null;
+
+            if (choice == "1")
+            {
+                isAvailable = true;
+                Console.WriteLine("\nShowing: AVAILABLE VEHICLES");
+            }
+            else if (choice == "2")
+            {
+                isAvailable = false;
+                Console.WriteLine("\nShowing: RENTED OUT VEHICLES");
+            }
+            else
+            {
+                Console.WriteLine("\nShowing: ALL VEHICLES");
+            }
+
+            var vehicles = businessLogic.GetAllVehicles(isAvailable);
 
             if (vehicles.Count == 0)
             {
-                Console.WriteLine("No vehicles found in the database.");
+                Console.WriteLine("No vehicles found matching that filter.");
                 return;
             }
 
