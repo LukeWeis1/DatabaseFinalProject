@@ -233,6 +233,9 @@ namespace VehicleRentalsCLI
                 Console.WriteLine($"\nName: {c.FirstName} {c.LastName}");
                 Console.WriteLine($"DOB: {c.DateOfBirth.ToString("yyyy-MM-dd")} | License: {c.DriversLicenseNumber}");
 
+                string decryptedCard = EncryptionHelper.Decrypt(c.CardNumber);
+                Console.WriteLine($"Card on File: {decryptedCard}");
+
                 if (c.Emails.Count > 0)
                     Console.WriteLine($"Emails: {string.Join(", ", c.Emails)}");
                 else

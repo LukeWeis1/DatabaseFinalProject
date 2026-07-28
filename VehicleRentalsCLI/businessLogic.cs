@@ -24,7 +24,17 @@ namespace VehicleRentalsCLI
                 return null;
             }
 
-            return _dbContext.GetStaffMemberByCredentials(employeeId, password);
+            string hashedPassword = EncryptionHelper.HashPassword(password);
+
+            User? loggedInUser = _dbContext.GetStaffMemberByCredentials(employeeId, hashedPassword);
+
+            //This makes it so sample data without a hashed password still works
+            if (loggedInUser == null)
+            {
+                loggedInUser = _dbContext.GetStaffMemberByCredentials(employeeId, password);
+            }
+
+            return loggedInUser;
         }
 
         //Customer Logic
@@ -42,13 +52,16 @@ namespace VehicleRentalsCLI
                 return false;
             }
 
+            string encryptedCard = EncryptionHelper.Encrypt(card);
+
+
             Customer newCustomer = new Customer
             {
                 DriversLicenseNumber = license,
                 FirstName = firstName,
                 LastName = lastName,
                 DateOfBirth = dateOfBirth,
-                CardNumber = card,
+                CardNumber = encryptedCard,
                 CreatedBy = staffId,
                 Emails = emails,
                 PhoneNumbers = phoneNumbers
@@ -158,13 +171,15 @@ namespace VehicleRentalsCLI
                 return false;
             }
 
+            string hashedPassword = EncryptionHelper.HashPassword(password);
+
             StaffMember newStaff = new StaffMember
             {
                 FirstName = firstName,
                 LastName = lastName,
                 DateOfBirth = dateOfBirth,
                 IsManager = makeManager,
-                Password = password,
+                Password = hashedPassword,
                 CompanyPhoneNumber = phone,
                 CompanyEmailAddress = email,
                 CreatedBy = creatorId

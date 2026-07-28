@@ -203,6 +203,7 @@ namespace VehicleRentalsCLI
                             c.FirstName,
                             c.LastName,
                             c.DateOfBirth,
+                            c.CardNumber,
                             STRING_AGG(DISTINCT ce.EmailAddress, ',') AS Emails,
                             STRING_AGG(DISTINCT cp.PhoneNumber, ',') AS PhoneNumbers
                         FROM Customer c
@@ -222,7 +223,9 @@ namespace VehicleRentalsCLI
                                 DriversLicenseNumber = (string)reader["DriversLicenseNumber"],
                                 FirstName = (string)reader["FirstName"],
                                 LastName = (string)reader["LastName"],
-                                DateOfBirth = reader.GetFieldValue<DateOnly>(reader.GetOrdinal("DateOfBirth")).ToDateTime(TimeOnly.MinValue)
+                                DateOfBirth = reader.GetFieldValue<DateOnly>(reader.GetOrdinal("DateOfBirth")).ToDateTime(TimeOnly.MinValue),
+                                CardNumber = (string)reader["CardNumber"]
+
                             };
 
                             string emailsAgg = reader["Emails"] as string ?? "";
