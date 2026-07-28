@@ -39,7 +39,8 @@ namespace VehicleRentalsCLI
                 Console.WriteLine("6. View Staff Directory");
                 Console.WriteLine("7. Rent a Vehicle");
                 Console.WriteLine("8. Return a Vehicle");
-                Console.WriteLine("9. Exit");
+                Console.WriteLine("9. View Rental Records");
+                Console.WriteLine("0. Exit");
                 Console.Write("\n Choose an option: ");
 
                 string choice = Console.ReadLine() ?? "";
@@ -77,6 +78,10 @@ namespace VehicleRentalsCLI
                     HandleReturnVehicleScreen(businessLogic);
                 }
                 else if (choice == "9")
+                {
+                    HandleViewRentsScreen(businessLogic);
+                }
+                else if (choice == "0")
                 {
                     exitApp = true;
                     Console.WriteLine("\n Goodbye!");
@@ -334,6 +339,31 @@ namespace VehicleRentalsCLI
             {
                 Console.WriteLine($"\nVehicle {plate} has been successfully returned and is now available!");
             }
+        }
+
+        static void HandleViewRentsScreen(BusinessLogic businessLogic)
+        {
+            Console.WriteLine("\n--- RENTAL HISTORY ---");
+            var records = businessLogic.GetAllRentalRecords();
+
+            if (records.Count == 0)
+            {
+                Console.WriteLine("No rental records found.");
+                return;
+            }
+
+            foreach (var r in records)
+            {
+                string returnStatus = r.ReturnDate.HasValue
+                    ? $"Returned: {r.ReturnDate.Value.ToString("yyyy-MM-dd")}"
+                    : "STILL OUT";
+
+                Console.WriteLine($"\nVehicle: [{r.LicensePlate}] {r.VehicleInfo}");
+                Console.WriteLine($"Customer: {r.CustomerName} (DL: {r.DriversLicenseNumber})");
+                Console.WriteLine($"Rented On: {r.RentedDate.ToString("yyyy-MM-dd")} | Expected Back: {r.ExpectedReturnDate.ToString("yyyy-MM-dd")} | {returnStatus}");
+                Console.WriteLine($"Processed By: {r.ProcessedByStaff}");
+            }
+            Console.WriteLine("\n----------------------");
         }
     }
 }

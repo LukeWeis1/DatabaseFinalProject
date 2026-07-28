@@ -298,6 +298,67 @@ namespace VehicleRentalsCLI
             return vehicles;
         }
 
+        public System.Collections.Generic.List<RentalRecord> GetAllRentalRecords()
+        {
+            var records = new System.Collections.Generic.List<RentalRecord>();
+            try
+            {
+                using (var conn = new NpgsqlConnection(ConnectionString))
+                {
+                    conn.Open();
+
+                    string sql = @"
+                        SELECT 
+                            r.LicensePlate, 
+                            v.Make, 
+                            v.Model, 
+                            r.DriversLicenseNumber, 
+                            c.FirstName AS CustFirst, 
+                            c.LastName AS CustLast, 
+                            s.FirstName AS StaffFirst, 
+                            s.LastName AS StaffLast, 
+                            r.RentedDate, 
+                            r.ExpectedReturnDate, 
+                            r.ReturnDate
+                        FROM Rents r
+                        JOIN Vehicle v ON r.LicensePlate = v.LicensePlate
+                        JOIN Customer c ON r.DriversLicenseNumber = c.DriversLicenseNumber
+                        JOIN StaffMember s ON r.EmployeeID = s.EmployeeID
+                        ORDER BY r.RentedDate DESC;";
+
+                    using (var cmd = new NpgsqlCommand(sql, conn))
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var record = new RentalRecord
+                            {
+                                LicensePlate = (string)reader["LicensePlate"],
+                                VehicleInfo = $"{reader["Make"]} {reader["Model"]}",
+                                DriversLicenseNumber = (string)reader["DriversLicenseNumber"],
+                                CustomerName = $"{reader["CustFirst"]} {reader["CustLast"]}",
+                                ProcessedByStaff = $"{reader["StaffFirst"]} {reader["StaffLast"]}",
+                                RentedDate = reader.GetFieldValue<DateOnly>(reader.GetOrdinal("RentedDate")).ToDateTime(TimeOnly.MinValue),
+                                ExpectedReturnDate = reader.GetFieldValue<DateOnly>(reader.GetOrdinal("ExpectedReturnDate")).ToDateTime(TimeOnly.MinValue)
+                            };
+
+                            if (!reader.IsDBNull(reader.GetOrdinal("ReturnDate")))
+                            {
+                                record.ReturnDate = reader.GetFieldValue<DateOnly>(reader.GetOrdinal("ReturnDate")).ToDateTime(TimeOnly.MinValue);
+                            }
+
+                            records.Add(record);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"\nCould not retrieve rental records: {ex.Message}");
+            }
+            return records;
+        }
+
         public System.Collections.Generic.List<StaffMember> GetAllStaffMembers()
         {
             var staffList = new System.Collections.Generic.List<StaffMember>();

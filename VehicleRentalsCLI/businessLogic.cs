@@ -177,5 +177,10 @@ namespace VehicleRentalsCLI
         {
             return _dbContext.GetAllStaffMembers();
         }
+
+        public System.Collections.Generic.List<RentalRecord> GetAllRentalRecords()
+        {
+            return _dbContext.GetAllRentalRecords();
+        }
     }
 }

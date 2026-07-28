@@ -46,4 +46,15 @@ namespace VehicleRentalsCLI
         public int? CreatedBy { get; set; }
     }
 
+    public class RentalRecord
+    {
+        public string LicensePlate { get; set; } = "";
+        public string VehicleInfo { get; set; } = "";
+        public string DriversLicenseNumber { get; set; } = "";
+        public string CustomerName { get; set; } = "";
+        public string ProcessedByStaff { get; set; } = "";
+        public DateTime RentedDate { get; set; }
+        public DateTime ExpectedReturnDate { get; set; }
+        public DateTime? ReturnDate { get; set; }
+    }
 }
