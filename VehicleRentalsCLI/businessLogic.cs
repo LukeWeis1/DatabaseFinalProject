@@ -178,9 +178,9 @@ namespace VehicleRentalsCLI
             return _dbContext.GetAllStaffMembers();
         }
 
-        public System.Collections.Generic.List<RentalRecord> GetAllRentalRecords()
+        public System.Collections.Generic.List<RentalRecord> GetAllRentalRecords(bool? isReturned = null)
         {
-            return _dbContext.GetAllRentalRecords();
+            return _dbContext.GetAllRentalRecords(isReturned);
         }
     }
 }

@@ -344,11 +344,34 @@ namespace VehicleRentalsCLI
         static void HandleViewRentsScreen(BusinessLogic businessLogic)
         {
             Console.WriteLine("\n--- RENTAL HISTORY ---");
-            var records = businessLogic.GetAllRentalRecords();
+            Console.WriteLine("1. Show Returned Vehicles");
+            Console.WriteLine("2. Show Active Rentals (Still Out)");
+            Console.WriteLine("3. Show All Records");
+            Console.Write("Filter choice (1-3): ");
+
+            string choice = Console.ReadLine() ?? "";
+            bool? isReturned = null;
+
+            if (choice == "1")
+            {
+                isReturned = true;
+                Console.WriteLine("\nShowing: RETURNED VEHICLES");
+            }
+            else if (choice == "2")
+            {
+                isReturned = false;
+                Console.WriteLine("\nShowing: ACTIVE RENTALS");
+            }
+            else
+            {
+                Console.WriteLine("\nShowing: ALL RECORDS");
+            }
+
+            var records = businessLogic.GetAllRentalRecords(isReturned);
 
             if (records.Count == 0)
             {
-                Console.WriteLine("No rental records found.");
+                Console.WriteLine("No rental records found matching that filter.");
                 return;
             }
 

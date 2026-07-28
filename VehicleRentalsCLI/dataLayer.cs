@@ -298,7 +298,7 @@ namespace VehicleRentalsCLI
             return vehicles;
         }
 
-        public System.Collections.Generic.List<RentalRecord> GetAllRentalRecords()
+        public System.Collections.Generic.List<RentalRecord> GetAllRentalRecords(bool? isReturned = null)
         {
             var records = new System.Collections.Generic.List<RentalRecord>();
             try
@@ -323,8 +323,21 @@ namespace VehicleRentalsCLI
                         FROM Rents r
                         JOIN Vehicle v ON r.LicensePlate = v.LicensePlate
                         JOIN Customer c ON r.DriversLicenseNumber = c.DriversLicenseNumber
-                        JOIN StaffMember s ON r.EmployeeID = s.EmployeeID
-                        ORDER BY r.RentedDate DESC;";
+                        JOIN StaffMember s ON r.EmployeeID = s.EmployeeID";
+
+                    if (isReturned.HasValue)
+                    {
+                        if (isReturned.Value)
+                        {
+                            sql += " WHERE r.ReturnDate IS NOT NULL";
+                        }
+                        else
+                        {
+                            sql += " WHERE r.ReturnDate IS NULL";
+                        }
+                    }
+
+                    sql += " ORDER BY r.RentedDate DESC;";
 
                     using (var cmd = new NpgsqlCommand(sql, conn))
                     using (var reader = cmd.ExecuteReader())
