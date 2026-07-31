@@ -209,7 +209,7 @@ namespace VehicleRentalsCLI
                         FROM Customer c
                         LEFT JOIN CustomerEmails ce ON c.DriversLicenseNumber = ce.DriversLicenseNumber
                         LEFT JOIN CustomerPhoneNumbers cp ON c.DriversLicenseNumber = cp.DriversLicenseNumber
-                        GROUP BY c.DriversLicenseNumber, c.FirstName, c.LastName, c.DateOfBirth
+                        GROUP BY c.DriversLicenseNumber
                         ORDER BY c.LastName, c.FirstName;";
                     //Used left join so it would still show customers without emails and phone numbers
 
