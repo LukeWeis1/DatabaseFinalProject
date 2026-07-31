@@ -38,7 +38,7 @@ To run this application locally, you will need:
         - LastName
         - DateOfBirth
         - IsManager
-        - Password
+        - Password (Hashed in DB)
         - CompanyPhoneNumber
         - CompanyEmailADdress
         - CreatedBy
@@ -55,7 +55,7 @@ To run this application locally, you will need:
         - FirstName
         - LastName
         - DateOfBirth
-        - CardNumber
+        - CardNumber (Encrypted in DB)
         - CreatedBy
     -   CustomerEmails
         - DriversLicenseNumber
