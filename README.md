@@ -1,6 +1,6 @@
 # Vehicle Rental CLI System
 
-This project is a C# CLI application for managing a vehicle rental business.
+This project is a C# CLI application for managing a vehicle rental business.  The requirements for this project can be found here: https://github.com/LukeWeis1/DatabaseFinalProject/blob/main/Vehicle%20Rental%20Database%20Requirements%20Gathering.pdf
 
 ## Key Features
 - Secure login system with different roles for managers and staff
