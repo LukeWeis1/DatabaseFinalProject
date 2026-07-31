@@ -76,3 +76,21 @@ More detail on the schema can be found at https://github.com/LukeWeis1/DatabaseF
 3. Execute sampleData.sql in the query tool to populate the database with sample data.
     - Note: Passwords and Credit Card numbers are unencrypted in the sample data.  The application is designed to be able to handle this data, but when creating new data in the application, it will be properly encrypted.
 
+### Application Configuration
+1. Open `dataLayer.cs`
+2. Locate the `ConnectionString` variable at the top of the class.
+3. Update the `Username` and `Password` to match your local PostgreSQL installation credentials
+```csharp
+private const string ConnectionString = "Host=localhost;Username=postgres;Password=YOUR_PASSWORD_HERE;Database=VehicleRental";
+```
+
+### Running the Application
+1. In the terminal, make sure you are in the VehicleRentalsCLI folder
+2. Run the command `dotnet run`
+3. You can now login with 1 of the 2 provided test accounts
+    - Admin Test Account:
+      - Employee ID: 1
+      - Password: admin_hash
+   -  Staff Member Test Account:
+       - Employee ID: 2
+       - Password: luke_hash
